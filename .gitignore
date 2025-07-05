@@ -1,0 +1,55 @@
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# PyInstaller
+dist/
+build/
+*.spec
+
+# Logs and data files
+*.log
+*.txt
+*.png
+*.jpg
+*.jpeg
+*.wav
+*.mp3
+*.mp4
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Credentials (never commit these!)
+config.json
+credentials.txt
+*.key
+*.pem
+
+# Test files
+test_*
+*_test.py
+
+# Generated executables
+*.exe
+*.app
+SystemUpdate* 
