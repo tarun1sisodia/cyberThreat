@@ -1,0 +1,3 @@
+# USB Auto-Launch Rule
+# This rule automatically executes usb_autorun.py when USB is plugged in
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="*", ATTRS{idProduct}=="*", RUN+="/usr/bin/python3 /media/%E2%82%AC/usb_autorun.py" 
