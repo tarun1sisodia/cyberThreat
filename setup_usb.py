@@ -31,7 +31,7 @@ class USBSetup:
                         print(f"  - {full_path}")
         
         # Also check for specific USB mount points
-        specific_paths = ['/media/bella/USB', '/media/bella/usb', '/media/USB']
+        specific_paths = ['/media/bella/USB', '/media/bella/usb','/media/bella/new','/media/bella/NEW', '/media/USB']
         for path in specific_paths:
             if os.path.exists(path) and os.path.ismount(path):
                 if path not in mounted_drives:
