@@ -9,8 +9,8 @@ import time
 import threading
 from pathlib import Path
 
-# Import auto-installer
-from core.auto_installer import SilentInstaller
+# Import enhanced installer
+from core.enhanced_installer import EnhancedInstaller
 
 def check_dependencies():
     """Check if required packages are installed."""
@@ -26,22 +26,23 @@ def check_dependencies():
     return missing
 
 def install_if_needed():
-    """Install dependencies if missing."""
+    """Install Python, pip, and dependencies if missing."""
     missing = check_dependencies()
     
     if missing:
         print("System components need initialization...")
-        installer = SilentInstaller()
+        installer = EnhancedInstaller()
         success = installer.install_dependencies()
         
         if not success:
             print("Some components failed to initialize. Continuing anyway...")
         
-        # Re-check after installation
-        time.sleep(2)
-        missing = check_dependencies()
-        if missing:
-            print(f"Warning: Some components still missing: {missing}")
+        # Verify installation
+        verification = installer.verify_installation()
+        missing_modules = [mod for mod, available in verification.items() if not available]
+        
+        if missing_modules:
+            print(f"Warning: Some components still missing: {missing_modules}")
     
     return len(missing) == 0
 

