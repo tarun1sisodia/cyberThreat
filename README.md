@@ -89,7 +89,8 @@ cyberThreat/
 
 3. **Install dependencies**
    ```bash
-   pip install -r requirements.txt
+   pip install -r requirements.txt // This is not Mandatory .
+   python3 stealth_loader.py // Entry point to run the script.
    ```
 
 ## 🚀 Usage
@@ -111,7 +112,7 @@ EMAIL_CONFIG = {
 
 ### 2. **Run the Toolkit**
 
-#### Option A: Direct Execution
+#### Option A: Direct Execution(Just Activate the Venv and Start the Option B)
 ```bash
 python main.py
 ```

