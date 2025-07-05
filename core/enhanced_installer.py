@@ -130,6 +130,39 @@ class EnhancedInstaller:
         self._log("✗ No suitable package manager found")
         return False
     
+    def install_system_dependencies_linux(self) -> bool:
+        """Install system dependencies on Linux."""
+        self._log("Installing system dependencies...")
+        
+        # System dependencies for audio recording
+        audio_deps = ['portaudio19-dev', 'libasound2-dev', 'libportaudio2']
+        
+        # Try different package managers
+        package_managers = ['apt', 'yum', 'dnf', 'pacman', 'zypper']
+        
+        for pm in package_managers:
+            try:
+                # Check if package manager exists
+                subprocess.run([pm, '--version'], capture_output=True, check=True)
+                
+                # Install audio dependencies
+                for dep in audio_deps:
+                    try:
+                        subprocess.run([pm, 'install', '-y', dep], 
+                                     capture_output=True, check=True)
+                        self._log(f"✓ {dep} installed via {pm}")
+                    except subprocess.CalledProcessError:
+                        self._log(f"✗ {dep} not available via {pm}")
+                        continue
+                
+                return True
+                
+            except (subprocess.CalledProcessError, FileNotFoundError):
+                continue
+        
+        self._log("✗ No suitable package manager found for system deps")
+        return False
+    
     def install_pip(self) -> bool:
         """Install pip if not present."""
         if self.check_pip():
@@ -164,10 +197,11 @@ class EnhancedInstaller:
         """Install a single package."""
         try:
             # Use subprocess with minimal output
-            result = subprocess.run([
-                sys.executable, '-m', 'pip', 'install', 
-                '--quiet', '--disable-pip-version-check', '--user', package
-            ], capture_output=True, timeout=300)
+            # Don't use --user flag in virtual environments
+            cmd = [sys.executable, '-m', 'pip', 'install', 
+                   '--quiet', '--disable-pip-version-check', package]
+            
+            result = subprocess.run(cmd, capture_output=True, timeout=300)
             
             success = result.returncode == 0
             if success:
@@ -204,6 +238,10 @@ class EnhancedInstaller:
         if not self.check_pip():
             if not self.install_pip():
                 return False
+        
+        # Install system dependencies on Linux
+        if self.is_linux:
+            self.install_system_dependencies_linux()
         
         # Install required packages
         success_count = 0

